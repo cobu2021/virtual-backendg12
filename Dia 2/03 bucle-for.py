@@ -26,3 +26,4 @@ for numero in range(5,10,2):
 for posicion in range(3):
     print(notas[posicion])
 
+#sdfsd
