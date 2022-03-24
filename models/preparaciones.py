@@ -1,4 +1,3 @@
-from msilib import type_binary
 from config import conexion
 from sqlalchemy import Column,types, orm
 from sqlalchemy.sql.schema import ForeignKey
