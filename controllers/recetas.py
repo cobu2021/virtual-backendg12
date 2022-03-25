@@ -1,4 +1,3 @@
-from ast import excepthandler
 from flask_restful import Resource , request
 from models.recetas import Receta
 from dtos.receta_dto import (RecetaRequestDTO, 
