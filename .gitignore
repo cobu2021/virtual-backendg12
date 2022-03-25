@@ -1,4 +1,0 @@
-entorno_fask
-#Excluimos los archivos cache de python
-*.pyc
-.env

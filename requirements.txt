@@ -1,4 +1,0 @@
-#lo que hace el-r dentro del archivo es que jalara el listado
-#de las linrerias de mi otro archivo
--r requirements-dev.txt
-gunicorn==20.1.0
