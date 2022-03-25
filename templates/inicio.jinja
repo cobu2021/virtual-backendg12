@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p>Hola Bienvenido a mi api de Monedero</p>
+    <p>Presentado por {{nombre}}</p>
+    <p>Los Galacticos Son :</p>
+    {#Jinja >en una libreria que sirve para renderizar html's en el backend
+     como el flask django,rapify#}
+    {#https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures#}
+
+    <ol>
+        {% for integrante in integrantes %}
+        <p>integrante</p>
+        {% endfor %} 
+    </ol>
+      {{ integrantes}}
+      {# En jinja podemos usar los diccionarios como si fueran JSON s en JS
+         #}
+      <p>El usuario es {{usuario.nombre}}</p>
+      {# listar las selecciones de futbol en forma de una tabla #}
+    <table>
+        <tr>
+          <th>seleccion</th>
+          <th>clasificado</th>
+        </tr>
+        {# hacer aqui el ejercicio #}
+        {% for seleccion in selecciones%}
+        <tr>
+            <td>
+                {{seleccion.nombre}}
+            </td>
+            <td>
+                {% if seleccion.clasificado == true %} 
+                'Nos Vemos en Qatar' 
+                {% else %} 'Con suerte
+                en el proximo' {%endif%}
+            </td>
+        </tr>
+        {% endfor %}
+      </table>
+
+</body>
+</html>
