@@ -1,5 +1,8 @@
+from ast import arg
 from flask_restful import Resource , request 
-from dto.regisro_dto import RegistroDTO
+from dto.regisro_dto import RegistroDTO , UsuarioResponseDTO , LoginDTO
+from models.usuarios import Usuario
+from config import conexion
 
 
 
@@ -9,11 +12,35 @@ class RegistroController(Resource):
         body = request.get_json()
         try:
             data = RegistroDTO().load(body)
+            nuevoUsuario = Usuario(**data)
+            ## generar un hash de la contraseña
+            nuevoUsuario.encriptar_pwd()
+            conexion.session.add(nuevoUsuario)
+            conexion.session.commit()
+            respuesta = UsuarioResponseDTO().dump(nuevoUsuario)
             return {
-            'message' : 'Usuario registrado exitosamente'
+            'message' : 'Usuario registrado exitosamente',
+            'content' : respuesta
             },201
         except Exception as e:
             return {
                 'message' : 'Error al registrar usuario',
                 'content': e.args
+            }, 400
+
+class LoginController(Resource):
+    def post(Self):
+        body = request.get_json()
+        #HAcer un dto que solamente recibaun correo y un pasword,el correo debe ser
+        #email, no es necesario usar un SQLAlchemyAutoSchema
+        try:
+            data = LoginDTO().load(body)
+            return {
+                'message' : 'Bienvenido'
             }
+        except Exception as e:
+            return{
+                'message' : 'Credenciales incorrectas',
+                'content' : e.args
+            }
+
