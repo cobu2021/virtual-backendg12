@@ -1,24 +1,25 @@
-from datetime import timedelta
-from flask import Flask , render_template
+from flask import Flask, render_template
+from flask_jwt import JWT, jwt_required, current_identity
 from flask_restful import Api
-from controllers.usuarios import RegistroController ,LoginController 
-from controllers.movimientos import MovimientoController
-
+from controllers.usuarios import (LoginController,
+                                  RegistroController,
+                                  ResetPasswordController)
 from config import validador, conexion
 from os import environ
 from dotenv import load_dotenv
 from flask_cors import CORS
-from flask_jwt import JWT , jwt_required , current_identity
+from dtos.registro_dto import UsuarioResponseDTO
+from seguridad import autenticador, identificador
+from datetime import timedelta
 from seed import categoriaSeed
-from seguridad import autenticador, identificador 
-from dto.registro_dto import UsuarioResponseDTO
-
+from controllers.movimientos import MovimientoController
 
 load_dotenv()
 
 app = Flask(__name__)
 
 CORS (app=app)
+
 app.config['SECRET_KEY'] = environ.get('JWT_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL')
 #para cambiar el endpoint de mi JWT
@@ -29,9 +30,8 @@ app.config['JWT_AUTH_USERNAME_KEY'] = 'correo'
 app.config['JWT_AUTH_PASSWORD_KEY'] = 'pass'
 #para cambiar el tiempo de expiracion de mi jwt
 app.config['JWT_EXPIRATION_DELTA'] = timedelta(hours=1 , minutes=5)
+# Para indicar cual sera el prefijo de la token en los headers de authorizatio
 app.config['JWT_AUTH_HEADER_PREFIX'] = 'Bearer'
-
-
 jsonwebtoken = JWT(app=app, authentication_handler=autenticador,
                     identity_handler=identificador)
 
@@ -49,9 +49,36 @@ def seed():
     # ahora hacemos el seed de las tablas respectivas
     categoriaSeed()
 
+
 @app.route('/')
 def inicio():
-    pass
+    #render_template > renderiza un archivo .html o .jinja para flask lo que pueda leer e interpretar al cliete
+    return render_template('inicio.jinja', nombre='Eduardo', dia='Jueves' , integrantes=[
+    'Foca',
+    'Lapagol',
+    'Ruizdiaz'
+    'Paolin',
+    'Rayo Advincula',
+    ],usuario= {
+        'nombre': 'juan',
+        'direccion': ' las piedritas 105',
+        'edad': '40'
+    }, selecciones= [{
+        'nombre' :'Bolivia',
+        'Clasificado' : True
+    },{
+        'nombre': 'Brasil',
+        'clasificado': True
+    },{
+        'nombre': 'chile',
+        'clasificado' : False
+    },{
+        'nombre': 'Peru',
+        'Timado' : True 
+    }])
+
+
+# al colocar jwt_required estamos indicando que para ese controlador se debera de proveer una JWT valida
 @app.route('/yo')
 @jwt_required()
 def perfil_usuario():
@@ -63,30 +90,11 @@ def perfil_usuario():
         'content' : usuario
     }
 
-
-    #render_template > renderiza un archivo .html o .jinja para flask lo que pueda leer e
-    #interpretar al cliete
-    return render_template('inicio.jinja', nombre='Eduardo', dia='Jueves' , integrantes=[
-    'Foca',
-    'Lapagol',
-    'Paolin',
-    'Rayo Advincula',
-    ],usuario= {
-        'nombre': 'juan',
-        'direccion': ' las piedritas 105',
-        'edad': '40'
-    }, selecciones= [{
-        'nombre' :'Bolivia',
-        'Clasificado' : True
-    },{
-        'nombre': 'chile',
-        'clasificado' : False
-    },{
-        'nombre': 'Peru',
-        'Timado' : True 
-    }])
-
 api.add_resource(RegistroController, '/registro')
 api.add_resource(LoginController, '/Login')
+api.add_resource(MovimientoController, '/movimiento', '/movimientos')
+api.add_resource(ResetPasswordController, '/reset-password')
+
+
 if(__name__ == '__main__'):
     app.run(debug=True , port=8080)

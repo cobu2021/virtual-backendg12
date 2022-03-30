@@ -1,6 +1,6 @@
 from flask_restful import Resource, request
 from models.movimientos import Movimiento
-from dtos.movimiento_dto import MovimientoRequestDTO, MovimientoResponseD
+from dtos.movimiento_dto import MovimientoRequestDTO, MovimientoResponseDTO
 from flask_jwt import jwt_required, current_identity
 from config import conexion
 
@@ -19,7 +19,7 @@ class MovimientoController(Resource):
             conexion.session.add(nuevoMovimiento)
             conexion.session.commit()
             resultado = MovimientoResponseDTO().dump(nuevoMovimiento)
-
+            
             return {
                 'message': 'Movimiento creado exitosamente',
                 'content': resultado

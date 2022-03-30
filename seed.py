@@ -5,7 +5,7 @@ from config import conexion
 
 def categoriaSeed():
     #si existe la categoria ya no se ingresa
-    conexion.session.query(Categoria).filter(
+    categorias = conexion.session.query(Categoria).filter(
         Categoria.nombre.like=='%OCIO', Categoria.nombre == 'COMIDA',
         Categoria.nombre =='EDUCACION', Categoria.nombre =='VIAJES').first()
     if categorias is not None:
