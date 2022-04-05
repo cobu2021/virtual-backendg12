@@ -31,7 +31,7 @@ def autenticador(username, password):
 def identificador(payload):
     """ Sirve para validar al usuario previamente autenticado"""
     usuarioEncontrado : Usuario | None = conexion.session.query(
-        Usuario).filter_by(id=payload['indentity']).first()
+        Usuario).filter_by(id=payload['identity']).first()
     if usuarioEncontrado:
         return {
             'id' : usuarioEncontrado.id,

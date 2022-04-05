@@ -13,7 +13,7 @@ class Movimiento(conexion.Model):
     tipo = Column(type_= types.Enum('INGRESO','EGRESO'), nullable=False)
     descripcion = Column(type_=types.Enum('SOLES','DOLARES','EUROS'))
     moneda = Column(type_=types.Enum('SOLES','DORALES','EUROS'))
-    fecha_creacion = Column(types_=types.DateTime(), default=datetime.now())
+    fecha_creacion = Column(type_=types.DateTime(), default=datetime.now())
     #RELACIONES (fk con sus relationsships)
     usuario_id = Column(ForeignKey(column='usuarios.id'), 
                         type_= types.Integer,nullable=False)
