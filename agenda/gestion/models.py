@@ -33,6 +33,8 @@ class Tareas(models.Model):
 
         # Cada opcion le pordemos pasar dos parametros en la cual el primero
         #sera su abreviatura para que se guarde en la bd y el segundo completo
+        #que se mostrara cuando queramos utilizar los valores en un formulario
+        #usando TEmplates(Jinja) o dentro del formulario de DRF
         TODO= 'TODO', 'TO_DO'
         IN_PROGRESS = 'IP' , 'IN_PROGRESS'
         DONE = 'DONE' , 'DONE'
@@ -57,7 +59,7 @@ class Tareas(models.Model):
 
     fechaCaducidad= models.DateTimeField(db_column='fecha_caducidad')
     importancia= models.IntegerField(null=False)
-    descripcion = models.TextField()
+    descripcion = models.TextField(null=True)
 
     createdAT = models.DateTimeField(auto_now_add=True , db_column='create_at')
     updatedAT = models.DateTimeField(auto_now_add=True , db_column='update_at')
