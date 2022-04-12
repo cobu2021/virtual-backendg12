@@ -3,14 +3,31 @@ from telnetlib import STATUS
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework.generics import ListAPIView, ListCreateAPIView
+from rest_framework.generics import (ListAPIView, 
+                                    ListCreateAPIView,
+                                    RetrieveUpdateDestroyAPIView,
+                                    CreateAPIView,
+                                    DestroyAPIView)
+                                    
 from .models import Etiqueta, Tareas 
-from .serializers import PruebaSerializer, TareasSerializer , EtiquetaSerializer,TareaSerializer
+from .serializers import (PruebaSerializer, 
+                          TareasSerializer ,
+                           EtiquetaSerializer,
+                           TareaSerializer,
+                           TareaPersonalizableSerializer,
+                           ArchivoSerializer,
+                           EliminarArchivoSerializer)
 from rest_framework import status
 # son un conjunto de librerias que django nos provee para poder utilizar de una manera
 #mas rapida ciertas configuraciones.
 #timezone sirve oara que en base a la configuracion que colocamos en el settings.py
 from django.utils import timezone
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from os import remove
+from django.conf import settings 
+
 
 @api_view(http_method_names=['GET' , 'POST'])
 def inicio(request : Request ):
@@ -95,8 +112,11 @@ class TareasApiView(ListCreateAPIView):
                 return Response(data={
                 'message' : 'La fecha no puede ser menor que la fecha actual'
                  }, status=status.HTTP_400_BAD_REQUEST)
-            return Response(data='', status=status.HTTP_201_CREATED)
+            #El metodo save() se podra llamar siempre que el serializado sea un ModelSerializador
+            
+            serializador.save()
 
+            return Response(data=serializador.data, status=status.HTTP_201_CREATED)
         else:
             # mostrara todos los errores que hicieron que el is_valid() no cumpla la condicion
             #serializador.errors
@@ -109,3 +129,69 @@ class TareasApiView(ListCreateAPIView):
 class EtiquetasApiView(ListCreateAPIView):
     queryset = Etiqueta.objects.all()
     serializer_class = EtiquetaSerializer
+
+class TareaApiView(RetrieveUpdateDestroyAPIView):
+    serializer_class = TareaSerializer #TAreaPersonalizableSerializer
+    queryset = Tareas.objects.all()
+
+
+class ArchivosApiView(CreateAPIView):
+    serializer_class = ArchivoSerializer
+
+    def post(self,request:Request):
+        print(request.FILES)
+        queryParams = request.query_params
+        carpetaDestino = queryParams.get('carpeta')
+
+        data= self.serializer_class(data=request.FILES)
+        if data.is_valid():
+            print(data.validated_data.get('archivo'))
+            #https://docs.djangoproject.com/es/4.0/_modules/django/core/files/uploadedfile/
+            archivo:InMemoryUploadedFile = data.validated_data.get('archivo')
+            print(archivo.size)
+            #solamente subir imagenes de hasta 5mb
+            #5(bytes) * 1024 > (kb) * 1024 > (mb)
+            #5 * 1024 * 1024
+            if archivo.size > (5* 1024 * 1024):
+                return Response(data={
+                    'message' : ' Archivo muy grande, no se puede ser masde 5MB'
+                } , status= status.HTTP_400_BAD_REQUEST)
+
+            #https://docs.djangoproject.com/en/4.0/topics/files/#storage-objects
+            resultado = default_storage.save(
+                (carpetaDestino+'/' if carpetaDestino is not None else'')+archivo.name, ContentFile(archivo.read()))
+            print(resultado)
+            return Response(data={
+                'message': 'archivo guardado exitosamente',
+                'content' :{
+                    'ubicacion' : resultado
+                      #'ubicacion' : archivo.name
+                }
+                },status=status.HTTP_201_CREATED)
+        else:
+            return Response(data={
+               'message': 'Error al subir imagen',
+               'content' : data.errors
+             }, status=status.HTTP_400_BAD_REQUEST)
+
+class EliminaArchivoApiView(DestroyAPIView):
+    # El generico DestroyAPIView solicita un pk como parametro de la url para eliminar
+    #un detetminado registro de unmodelopero se personalizara para no recibir ello
+    serializer_class = EliminarArchivoSerializer
+    
+
+    def delete(self, request: Request):
+        data = self.serializer_class(data=request.data)
+        try :
+                data.is_valid(raise_exception=True)
+                ubicacion = data.validated_data.get('archivo')
+                remove(settings.MEDIA_ROOT/ ubicacion)
+                return Response(data={
+                    'message' : 'Archivo elimido exitosamente'
+                })   
+        except Exception as e:
+            return Response(data={
+                'message': 'No se encontro el archivo a eliminar',
+                'content' : e.args
+            }, status=status.HTTP_404_NOT_FOUND)
+

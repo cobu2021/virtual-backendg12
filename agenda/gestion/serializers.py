@@ -11,7 +11,12 @@ class PruebaSerializer(serializers.Serializer):
 #dni serializers. IntegerField(min_value=10000000, max:value=99999999)
 
 class TareasSerializer(serializers.ModelSerializer):
-
+    #modifico la configuracion del modelo y le puedo setear la nueva 
+    # configuracion que respetara el serializador, no se puede hacer cambios de
+    #tipos de datos muy drasticos(x ejemplo: si en el modelo es un Integerfield
+    # en el serializador no ´podre cambiarlo a Charfield porque me lanzara un error
+    # al momento de guardar data)
+    foto = serializers.CharField(max_length=100)
     class Meta:
         model = Tareas
         fields = '__all__' #estare indicando que estare utilizando todas las columnas de mi tabla
@@ -64,3 +69,25 @@ class EtiquetaSerializer(serializers.ModelSerializer):
         #los campos del modelo que solamente quiero que sean lectura los podre definir en una lista
 
         read_only_fields=['createAt']
+
+class TareaPersonalizableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tareas
+        fields = '__all__'
+        #exclude = ['nombre] funciona tanto para lectura como escritura
+        extra_kgargs= {
+            'nombre':{
+                'read_only': True
+            }
+        }
+
+class ArchivoSerializer(serializers.Serializer):
+#max:lenth > indica la longitud maxima del nombre del archivo
+#use_url > si es verdadero retorna el linkcompleto de la ubicacion del archivo,
+#caso contrario
+    archivo= serializers.ImageField(max_length=100 , use_url=True)
+
+# crear un serializador en el cual reciba un nombre que sera un charfield cuya
+#longitud maxima sea100 caracteres
+class EliminarArchivoSerializer(serializers.Serializer):
+    archivo= serializers.CharField(max_length=80)

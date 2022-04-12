@@ -69,6 +69,10 @@ class Tareas(models.Model):
     #usar las relarionships porque ya estan integradas dentro de la relacion
     etiquetas = models.ManyToManyField(to=Etiqueta, related_name='tareas')
 
+    foto=models.ImageField(
+        upload_to='multimedia', # servirta para indicar donde se guarda las imagenes y si
+         null=True                        # no existe, creara la carpeta
+    )
     class Meta:
         db_table = 'tareas'
 
