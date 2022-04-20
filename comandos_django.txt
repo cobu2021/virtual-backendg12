@@ -44,4 +44,7 @@ python manage.py test > corre todos los test definidos en los archivos tests.py
       dentro de la clase
 
 
+
 https://docs.djangoproject.com/en/3.2/ref/django-admin/
+
+python manage.py createsuperuser > crea un superusuario para que pueda utilizado en el panel administrativo
