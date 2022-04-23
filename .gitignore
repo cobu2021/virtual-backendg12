@@ -7,3 +7,5 @@ entorno_flask/
 *.jpeg
 *.png
 *.gif
+
+static_files/

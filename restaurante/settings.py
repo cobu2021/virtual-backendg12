@@ -34,9 +34,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ue-f&ln#i(x*0vq4mmu_$fxcq&yw^zu4*-&cqlu*3o(19+*feb'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+#host que van a poder levantar la API
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
 
 
 # Application definition
@@ -48,8 +50,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #Librerias
     'rest_framework',
     'cloudinary',
+    'corsheaders',
+    #Aplicaciones
     'fact_electr',
     'menu',
     'autorizacion'
@@ -57,13 +62,17 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    #Agregar el middleware de los cors hasta antes del CommonMiddleware
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'restaurante.urls'
 
@@ -125,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Lima'
 
 USE_I18N = True
 
@@ -167,3 +176,18 @@ cloudinary.config(
     api_key=environ.get('CLOUDINARY_API_KEY'),
     api_secret=environ.get('CLOUDINARY_SECRET')
 )
+#http://whitenoise.evans.io/en/stable/
+# Sirve para indicar que jalara los estilos de los archivos estaticos
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+                     
+STATIC_ROOT = BASE_DIR / 'static_files'
+
+#Permitiras todoslos origenes (https://mipagina.com http://fraudes.com) 
+#CORS_ORIGIN_ALLOW_ALL = True
+#son los originspermitidos, si queremos usar todos usaremos CORS_ORIGIN_ALLOW_ALL
+CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:5500'] # http:misjackers.net
+#son los methodos permitidos,por defecto son todos
+CORS_ALLOWED_METHODS = ['GET', 'POST'] #no podra > Put/delete
+#los headers son las cabeceras permitidas, por defecto todos
+CORS_ALLOWED_HEADERS = ['content-type','authorization','origin']
