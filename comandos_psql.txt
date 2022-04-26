@@ -1,4 +1,0 @@
-Para ver la lista completa de comandos : https://www.postgresql.org/docs/current/app-psql.html
-psql -U USER -h HOST -d DATABASE -p PORT > conectarse a un servidor externo
-\l > lista toda la BD 
-\c prueba  accedes a la bd prueba (DATABASE_NAME)
